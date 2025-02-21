@@ -107,7 +107,6 @@ venv.bak/
 *.ipynb
 process.ipynb
 
-*.csv
 REF_DATA/*
 
 test.py
