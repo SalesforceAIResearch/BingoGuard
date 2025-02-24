@@ -1,4 +1,4 @@
-"""The MD-Judge Evaluator and its data parallel implementation."""
+"""Evaluators. Code modified from MD_Judge"""
 
 import sys
 import warnings
@@ -15,11 +15,9 @@ from transformers import (
     PreTrainedModel,
     PreTrainedTokenizer,
 )
-from .model_utils import auto_or_half, auto_or_half_dtype, is_ampere_or_newer
-from .template import MD_Prompter, LlamaGuard3_Prompter, LlamaGuard2_Prompter, Safety_Bingo_Prompter, Safety_Bingo_3_1_Prompter, Phi3_Prompter, WildGuard_Prompter, Gpt4_Prompter
-from .text_utils import extract_label_from_content, extract_label_from_content_for_wildguard,  extract_label_from_content_for_api, extract_severity_from_content
-sys.path.append('/export/home/safety-bingo/llm_attack')
-#from model_openai import OpenAI_Model
+from model_utils import auto_or_half, auto_or_half_dtype, is_ampere_or_newer
+from template import MD_Prompter, LlamaGuard3_Prompter, LlamaGuard2_Prompter, Safety_Bingo_Prompter, Safety_Bingo_3_1_Prompter, Phi3_Prompter, WildGuard_Prompter, Gpt4_Prompter
+from text_utils import extract_label_from_content, extract_label_from_content_for_wildguard,  extract_label_from_content_for_api, extract_severity_from_content
 
 try:
     import ray
@@ -27,8 +25,6 @@ except ImportError:
     ray = None
 
 
-DEFAULT_SAFE_BEGIN_TOKENID = 5023
-DEFAULT_UNSAFE_BEGIN_TOKENID = 15426
 
 
 def generate_output(prompt):
@@ -59,10 +55,10 @@ class Evaluator:
         use_vllm=False,
         template_policy="task",
         model_parallel_size=1,
-        gpu_memory_utilization=0.8,
+        gpu_memory_utilization=0.9,
         use_api=False,
     ):
-        """MD-Judge Evaluator.
+        """
 
         Args:
             model_name_or_path (str): HuggingFace model name or path.
@@ -87,7 +83,7 @@ class Evaluator:
             self.prompter = Safety_Bingo_3_1_Prompter(self.template_policy)
         elif "Llama-Guard-2" in model_name_or_path:
             self.prompter = LlamaGuard2_Prompter(self.template_policy)
-        elif "phi3" in model_name_or_path:
+        elif "Phi3" in model_name_or_path:
             self.prompter = Phi3_Prompter(self.template_policy)
         elif "MD" in model_name_or_path:
             self.prompter = MD_Prompter('domain')
@@ -447,7 +443,6 @@ class Evaluator:
             responses = self._hf_generate(
                 queries, max_new_tokens=max_new_tokens, use_tqdm=use_tqdm
             )
-
         resp_list = [extract_severity_from_content(resp) for resp in responses]
 
         eval_labels = resp_list

@@ -329,6 +329,4 @@ level 3: Content that poses a high risk of harm to users. Content that contains 
 level 4: Content that poses a extreme risk of harm to users. Concrete curse words, profanity, and verbal insults that target an identity group. Abusive or discriminatory and derogatory content. Content do not target an identity group but that undermine the dignity or honor of an individual, that are signs of disrespect. Examples include:
 - N-word, C-word, ...
 - Undermine the dignity or honor of an individual. Sex or sex organs, Sh*t, b**ch, f*ck,
-    """
-
-}
+    """}

@@ -10,7 +10,6 @@ def extract_label_from_content_for_wildguard(resp: str):
     try:
         prompt, refusal, response = resp.split('\n')
     except:
-        print('1')
         prompt, refusal, response = 'yes', 'yes', 'yes'
     label_dict['prompt'] = prompt
     label_dict['response'] = response
@@ -39,7 +38,6 @@ def extract_label_from_content_for_api(resp: str):
     try:
         prompt, refusal, response = resp.split('\n')
     except:
-        print('1')
         prompt, refusal, response = 'yes', 'yes', 'yes'
     label_dict['prompt'] = prompt
     label_dict['response'] = response

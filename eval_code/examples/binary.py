@@ -13,8 +13,8 @@ from constant import *
 
 import pandas as pd
 from ray.util import remove_placement_group
-from saladbench.evaluator import DDPMDJudgeEvaluator, Evaluator
-from saladbench.metrics import eval_auprc, eval_f1, eval_calibration, eval_per_level_and_type_acc
+from evaluator import DDPMDJudgeEvaluator, Evaluator
+from metrics import eval_auprc, eval_f1, eval_per_level_and_type_acc
 THIS_FILE = Path(__file__).resolve()
 
 def parse_args():
@@ -125,6 +125,7 @@ def read_example_data(input_name='beavortail', requries_reformat=False):
             template_data['messages'][0]['content'] = data['prompt']
             ds.append(copy.deepcopy(template_data))
         labels = []
+        # ["S", "H", "V", "HR", "SH", "S3", "H2", "V2"]
         for data in df:
             data = json.loads(data)
             label = 0
@@ -249,57 +250,6 @@ def read_example_data(input_name='beavortail', requries_reformat=False):
             template_data['messages'][1]['content'] = data['response']
             ds.append(copy.deepcopy(template_data))
         labels = [label == 'harmful' for label in df["prompt_harm_label"]]
-    elif 'safebingo_response' in input_name:
-
-        df = datasets.load_dataset('fanyin3639/safety_bingo_training_v5_with_prompt_cls', split='train')
-        df = df.filter(lambda example: not example['response'] == 'none')
-        for data in df:
-            template_data['messages'][0]['content'] = data['prompt']
-            template_data['messages'][1]['content'] = data['response']
-            ds.append(copy.deepcopy(template_data))
-        labels = ['unsafe' in label for label in df["label"]]
-    elif 'safebingo_prompt' in input_name:
-
-        df = datasets.load_dataset('fanyin3639/safety_bingo_training_v5_with_prompt_cls', split='train')
-        df = df.filter(lambda example: example['response'] == 'none')
-        for data in df:
-            template_data['messages'][0]['content'] = data['prompt']
-            template_data['messages'][1]['content'] = data['response']
-            ds.append(copy.deepcopy(template_data))
-        labels = ['unsafe' in label for label in df["label"]]
-    elif 'safe_' in input_name:
-
-        df = datasets.load_dataset(f'fanyin3639/{input_name}', split='train')
-        df = df.filter(lambda example: example['prompt'] is not None)
-        unsafe_columns = [name for name in df.column_names if name not in ['source', 'prompt', 'label', 'is_en', 'is_ambiguous']]
-        df = df.filter(lambda example: not any([example[col] is None for col in unsafe_columns]))
-        print(unsafe_columns)
-        #df = df.select(random.sample(list(range(len(df))), 2000))
-        for data in df:
-            model = random.sample(unsafe_columns, 1)[0]
-            response = data[model]
-
-            cnt = 0
-            while response.strip() == '' or "happy to help you!" in response:
-                if cnt > 3:
-                    break
-                model = random.sample(unsafe_columns, 1)[0]
-                response = data[model]
-                cnt += 1
-            template_data['messages'][0]['content'] = data['prompt']
-            template_data['messages'][1]['content'] = response
-            ds.append(copy.deepcopy(template_data))
-        if 'refusal' in input_name or 'safe_comply' in input_name:
-            labels = [0 for label in df["prompt"]]
-        else:
-            labels = [1 for label in df["prompt"]]
-    elif 'safety_bingo_training_prompts' in input_name:
-        df = datasets.load_dataset(input_name, split='train')
-        df = df.filter(lambda example: example['prompt'] is not None)
-        for data in df:
-            template_data['messages'][0]['content'] = data['prompt']
-            ds.append(copy.deepcopy(template_data))
-        labels = ['unsafe' in label for label in df['label']]
     elif 'safety_bingo_testset' in input_name:
         df = datasets.load_dataset(input_name, split='train')
         labels = []
@@ -352,3 +302,12 @@ if __name__ == "__main__":
             (accuracy, precision, fpr, recall, f1) = eval_f1(labels, eval_labels, print_=True)
             if args.per_level:
                 eval_per_level_and_type_acc(labels, eval_labels, eval_labels, messages, print_=True)
+
+        with open('wrong_examples.json', 'a') as f:
+            for idx, (g, p) in enumerate(zip(labels, eval_labels)):
+                if not g == p and int(g) == 0:
+                    messages[idx]['policy_type'] = args.template_policy
+                    messages[idx]['task_name'] = args.task_name
+                    f.write(json.dumps(messages[idx]))
+                    f.write('\n')
+

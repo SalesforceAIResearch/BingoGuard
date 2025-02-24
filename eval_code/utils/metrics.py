@@ -103,15 +103,15 @@ def eval_per_level_and_type_acc(targets, eval_labels, preds, messages, print_=Fa
 
 
     if print_:
-        print(f"Level 1 accuracy: {sum(levels['level1']) / len(levels['level1'])}")
-        print(f"Level 2 accuracy: {sum(levels['level2']) / len(levels['level2'])}")
-        print(f"Level 3 accuracy: {sum(levels['level3']) / len(levels['level3'])}")
-        print(f"Level 4 accuracy: {sum(levels['level4']) / len(levels['level4'])}")
+        print(f"Level 1 accuracy: {sum(np.array(levels['level1']) == 1) / len(levels['level1'])}")
+        print(f"Level 2 accuracy: {sum(np.array(levels['level2']) == 2) / len(levels['level2'])}")
+        print(f"Level 3 accuracy: {sum(np.array(levels['level3']) == 3) / len(levels['level3'])}")
+        print(f"Level 4 accuracy: {sum(np.array(levels['level4']) == 4) / len(levels['level4'])}")
         print(f"Level 1 std: {np.std(levels['level1'])}")
         print(f"Level 2 std: {np.std(levels['level2'])}")
         print(f"Level 3 std: {np.std(levels['level3'])}")
         print(f"Level 4 std: {np.std(levels['level4'])}")
-        print(f"Level 1 max: {np.array(levels['level1'])}")
-        print(f"Level 2 max: {np.array(levels['level2'])}")
-        print(f"Level 3 max: {np.array(levels['level3'])}")
-        print(f"Level 4 max: {np.array(levels['level4'])}")
+        print(f"Level 1 pred: {np.array(levels['level1'])}")
+        print(f"Level 2 pred: {np.array(levels['level2'])}")
+        print(f"Level 3 pred: {np.array(levels['level3'])}")
+        print(f"Level 4 pred: {np.array(levels['level4'])}")
