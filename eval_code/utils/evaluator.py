@@ -1,4 +1,6 @@
-"""Evaluators. Code modified from MD_Judge"""
+## Code modified from SALAD_BENCH
+## Original License: Apache License 2.0
+## https://github.com/OpenSafetyLab/SALAD-BENCH
 
 import sys
 import warnings

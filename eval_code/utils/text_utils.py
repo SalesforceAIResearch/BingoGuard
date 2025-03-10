@@ -1,3 +1,7 @@
+## Code modified from SALAD_BENCH
+## Original License: Apache License 2.0
+## https://github.com/OpenSafetyLab/SALAD-BENCH
+
 import re
 
 def extract_label_from_content_for_wildguard(resp: str):

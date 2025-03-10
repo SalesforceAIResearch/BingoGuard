@@ -1,3 +1,7 @@
+## Code modified from SALAD_BENCH
+## Original License: Apache License 2.0
+## https://github.com/OpenSafetyLab/SALAD-BENCH
+
 """Templates for different moderators.
 """
 
