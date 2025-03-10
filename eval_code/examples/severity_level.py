@@ -10,7 +10,6 @@ from pathlib import Path
 from severity_rubrics import Prompt_template, Prompt_template_zero_shot, per_type_example, per_type_rubrics
 from huggingface_hub import login
 from collections import OrderedDict, Counter
-login(token = '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')
 
 import pandas as pd
 from ray.util import remove_placement_group
